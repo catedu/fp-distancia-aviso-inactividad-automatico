@@ -2,6 +2,7 @@ import mysql.connector
 import smtplib
 import os
 import sys
+import time
 import io
 import smtplib
 import ssl
@@ -23,6 +24,7 @@ from email import encoders
 ###################################################
 ###################################################
 def abrir_conexion():
+    print("abrir_conexion()")
 
     conexion = mysql.connector.connect(
         host=DB_HOST,
@@ -62,8 +64,6 @@ def send_email(destinatario, asunto, texto):
                 print(e.message)
             else:
                 print(e)
-        finally:
-            server.quit()
     return enviado
 
 def return_text_for_html(cadena):
@@ -89,6 +89,7 @@ def return_text_for_html(cadena):
     return cadena
 
 def return_teacher_of_course(conexion, cid):
+    print("return_teacher_of_course(conexion, cid: '" + str(cid) + "')")
 
     cursor = conexion.cursor()
 
@@ -183,6 +184,7 @@ def main():
     last_cid = 0
     last_cname = ""
     num_emails_enviados = 0
+    num_emails_no_enviados = 0
     
     for fila in resultados:
         #
@@ -212,7 +214,12 @@ def main():
                 if enviado:
                     num_emails_enviados = num_emails_enviados + 1
                     print("num_emails_enviados: ", num_emails_enviados)
+                else:
+                    num_emails_no_enviados = num_emails_no_enviados + 1
+                    print("num_emails_no_enviados: ", num_emails_no_enviados)
+                    print("No se ha podido enviar el email a: ", destinatario)
 
+                time.sleep(2)
                 print(f"")
 
                 estudiantes.clear()
@@ -238,7 +245,11 @@ def main():
         if enviado:
             num_emails_enviados = num_emails_enviados + 1
             print("num_emails_enviados: ", num_emails_enviados)
-
+        else:
+            num_emails_no_enviados = num_emails_no_enviados + 1
+            print("num_emails_no_enviados: ", num_emails_no_enviados)
+            print("No se ha podido enviar el email a: ", destinatario)
+        time.sleep(2)
         # Agregamos al listado de estudiantes al que acabamos de avisar para este curso
         estudiantes.append(f"- {firstname} {lastname}")
 
@@ -251,7 +262,9 @@ def main():
 ###################################################
 ###################################################
 try:
+    print("Lanzando...")
     main()
+    print("Fin!")
 except Exception as exc:
     print("1.- traceback.print_exc()")
     traceback.print_exc()
@@ -259,4 +272,4 @@ except Exception as exc:
     traceback.print_exception(*sys.exc_info())
     print("--------------------")
     print(exc)
-    send_email("pruizs@campusdigitalfp.com", "ERROR - Informe automatizado gestión automática usuarios moodle", "Ha fallado el informe, revisar logs. <br/>Error: " + str(exc) + "<br/><br/><br/>" + str(traceback.print_exc()) + "<br/><br/><br/>" + str(traceback.print_exception(*sys.exc_info())))
+    send_email("pruizs@campusdigitalfp.com", "ERROR - Avisador inactividad automático Moodle", "Ha fallado el informe, revisar logs. <br/>Error: " + str(exc) + "<br/><br/><br/>" + str(traceback.print_exc()) + "<br/><br/><br/>" + str(traceback.print_exception(*sys.exc_info())))
