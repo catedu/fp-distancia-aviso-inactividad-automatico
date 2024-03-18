@@ -2,6 +2,7 @@
 Config.py
 Config-predesarrollo.py
 Config-www.py
+Cursos*.py
 .vscode/*
 __pycache__/*
 logs/*
