@@ -220,25 +220,25 @@ def main():
 
                 mensaje_teacher += f'''<br><br><strong>No responda a esta cuenta de correo electr&oacute;nico pues se trata de una cuenta automatizada no atendida</strong>.<br/><br/><br/>Saludos'''
 
-                mensaje_teacherUTF8 = mensaje_teacher.decode('utf-8')
-
                 destinatario = "fp@catedu.es"
                 if SUBDOMAIN == "www":
                     destinatario = teacher['email']
                 else:
                     print(f"Debería haberse enviado a 'teacher['email']' pero se enviará a '{destinatario}'" )
-                enviado = send_email(destinatario, f"FP a distancia - Avisados de inactividad", mensaje_teacherUTF8)
+                enviado = send_email(destinatario, f"FP a distancia - Avisados de inactividad", mensaje_teacher)
 
                 if enviado:
                     num_emails_enviados = num_emails_enviados + 1
                     print("num_emails_enviados: ", num_emails_enviados)
 
                     mensajes_email.append("- Avisado docente " + return_text_for_html(teacher['first_name']) + " " + return_text_for_html(teacher['last_name']) + " curso " + return_text_for_html(last_cname) + " de estudiantes inactivos.")
+                    mensajes_email.append(" ")
                 else:
                     num_emails_no_enviados = num_emails_no_enviados + 1
                     print("num_emails_no_enviados: ", num_emails_no_enviados)
                     print("No se ha podido enviar el email a: ", destinatario)
                     mensajes_email.append("- NO avisado docente " + return_text_for_html(teacher['first_name']) + " " + return_text_for_html(teacher['last_name']) + " avisado inactividad en " + return_text_for_html(last_cname) + ".")
+                    mensajes_email.append(" ")
 
                 time.sleep(2)
                 print(f"")
@@ -281,21 +281,20 @@ def main():
     mensajes_email.append("--------------------------------------------------------------------------")
     mensajes_email.append("--------------------------------------------------------------------------")
     mensajes_email.append("--------------------------------------------------------------------------")
-    mensajes_email.append("<b>RESUMEN de acciones llevadas a cabo por este script:</b>")
+    mensajes_email.append("<h2>RESUMEN de acciones llevadas a cabo por este script:</h2>")
     mensajes_email.append("- Cantidad de emails enviados: " + str(num_emails_enviados) )
     mensajes_email.append("- Cantidad de emails NO enviados: " + str(num_emails_no_enviados) )
-
+    mensajes_email.append("- Proceso terminado a las " + get_date_time_for_humans() + "")
+    
     texto = "<br/>\n".join( map(return_text_for_html, mensajes_email) )
-
-    textoUTF8 = texto.decode('utf-8')
 
     emails = REPORT_TO.split()
     for email in emails:
-        send_email(email, "Informe automatizado aviso inactividad usuarios moodle", textoUTF8)
+        send_email(email, "Informe automatizado aviso inactividad usuarios moodle", texto)
 
     emails = AVISAR_A_DEL_CENTRO.split()
     for email in emails:
-        send_email(email, "Informe automatizado aviso inactividad usuarios moodle", textoUTF8)
+        send_email(email, "Informe automatizado aviso inactividad usuarios moodle", texto)
 
 
 ###################################################
