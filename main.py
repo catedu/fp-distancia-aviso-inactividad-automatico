@@ -147,12 +147,13 @@ def main():
     mensajes_email = []
     #
     mensajes_email.append("<html><head><title></title></head><body>")
-    mensajes_email.append("<h1>" + get_date_time_for_humans() + " Comenzamos:</h1>")
+    mensajes_email.append("<h1>Comenzamos:</h1>")
+    mensajes_email.append("<p>" + get_date_time_for_humans() + "</p>")
     mensajes_email.append("<b>ENTORNO:</b>")
     mensajes_email.append(SUBDOMAIN)
     mensajes_email.append("<b>CENTRO:</b>")
     mensajes_email.append(CURSOS + " - " + NOMBRE_CENTRO)
-    mensajes_email.append("<b>RESUMEN DETALLADO</b>")
+    mensajes_email.append("<b>RESUMEN DETALLADO:</b>")
 
     print(f"----- Evaluando el centro {NOMBRE_CENTRO} de código {CURSOS}.")
 
@@ -200,6 +201,7 @@ def main():
     num_emails_enviados = 0
     num_emails_no_enviados = 0
     estudiantes = []
+    estudiantes_del_curso_avisados = 1
     
     for fila in resultados:
         #
@@ -230,8 +232,7 @@ def main():
                 if enviado:
                     num_emails_enviados = num_emails_enviados + 1
                     print("num_emails_enviados: ", num_emails_enviados)
-
-                    mensajes_email.append("- Avisado docente " + return_text_for_html(teacher['first_name']) + " " + return_text_for_html(teacher['last_name']) + " curso " + return_text_for_html(last_cname) + " de estudiantes inactivos.")
+                    mensajes_email.append("-- Avisado docente <b>" + return_text_for_html(teacher['first_name']) + " " + return_text_for_html(teacher['last_name']) + "</b> curso <b>" + return_text_for_html(last_cname) + "</b> de estudiantes inactivos.")
                     mensajes_email.append(" ")
                 else:
                     num_emails_no_enviados = num_emails_no_enviados + 1
@@ -239,7 +240,8 @@ def main():
                     print("No se ha podido enviar el email a: ", destinatario)
                     mensajes_email.append("- NO avisado docente " + return_text_for_html(teacher['first_name']) + " " + return_text_for_html(teacher['last_name']) + " avisado inactividad en " + return_text_for_html(last_cname) + ".")
                     mensajes_email.append(" ")
-
+                    
+                estudiantes_del_curso_avisados = 1
                 time.sleep(2)
                 print(f"")
 
@@ -267,12 +269,13 @@ def main():
         if enviado:
             num_emails_enviados = num_emails_enviados + 1
             print("num_emails_enviados: ", num_emails_enviados)
-            mensajes_email.append("Avisado estudiante " + nombre + " " + apellidos + " por inactividad en " + nombre_curso + ".")
+            mensajes_email.append("- (" + str(estudiantes_del_curso_avisados) + ") Avisado estudiante " + nombre + " " + apellidos + " por inactividad en " + nombre_curso + ".")
         else:
             num_emails_no_enviados = num_emails_no_enviados + 1
             print("num_emails_no_enviados: ", num_emails_no_enviados)
             print("No se ha podido enviar el email a: ", destinatario)
             mensajes_email.append("NO avisado estudiante " + nombre + " " + apellidos + " por inactividad en " + nombre_curso + ".")
+        estudiantes_del_curso_avisados = estudiantes_del_curso_avisados + 1
         time.sleep(2)
         # Agregamos al listado de estudiantes al que acabamos de avisar para este curso
         estudiantes.append(f"- {firstname} {lastname}")
